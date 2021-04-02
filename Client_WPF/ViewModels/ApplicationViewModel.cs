@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Web_Service.Models;
 using Client_WPF.Models;
+using Client_WPF.Cache;
 
 namespace Client_WPF.ViewModels
 {
@@ -15,6 +16,9 @@ namespace Client_WPF.ViewModels
             dbSize = db.Parks.Count();
 
             Parks = new ObservableCollection<ParkingInfo>();
+
+            Cache = new Caching<ParkingInfo>();
+            CacheList = new ObservableCollection<ParkingInfo>();
         }
 
         private readonly ParkingdbContext db;
@@ -27,10 +31,21 @@ namespace Client_WPF.ViewModels
             get { return selectedPark; }
             set
             {
+                if (value != null)
+                {
+                    var item = Cache.GetOrCreate(value.Id.ToString(), value);
+
+                    if (!CacheList.Contains(item))
+                        CacheList.Insert(0, item);
+                }
+
                 selectedPark = value;
                 OnPropertyChanged("SelectedPark");
             }
         }
+
+        private Caching<ParkingInfo> Cache { get; set; }
+        public ObservableCollection<ParkingInfo> CacheList { get; set; }
 
         // команда подгрузки данных в список
         private RelayCommand downCommand;
@@ -62,6 +77,28 @@ namespace Client_WPF.ViewModels
                       }
                   },
                  (obj) => Parks.Count < dbSize));
+            }
+        }
+
+        // команда удаления данных из кэша
+        private RelayCommand removeCommand;
+        public RelayCommand RemoveCommand
+        {
+            get
+            {
+                return removeCommand ??
+                  (removeCommand = new RelayCommand(obj =>
+                  {
+                      ParkingInfo park = obj as ParkingInfo;
+
+                      if (park != null)
+                      {
+                          CacheList.Remove(park);
+                          Cache.Remove(park.Id.ToString());
+                      }
+
+                  },
+                 (obj) => CacheList.Count > 0));
             }
         }
 
