@@ -69,8 +69,11 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
+                        <Button Command="{Binding AddCommand}"
+                                CommandParameter="{Binding SelectedPark}">Добавить в избранное</Button>
                         <Button Command="{Binding RemoveCommand}"
                             CommandParameter="{Binding SelectedPark}">Удалить</Button>
+
 
                     </StackPanel>
                 </TabItem.Content>
@@ -85,6 +88,27 @@
                         <TextBlock Margin="3"><Run Text="Избранное"/></TextBlock>
                     </StackPanel>
                 </TabItem.Header>
+
+                <TabItem.Content>
+                    <StackPanel>
+
+                        <ListBox Background="#ffc100" ItemsSource="{Binding Favorites}" SelectedItem="{Binding SelectedPark}" Height="360" >
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="5">
+                                        <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Path=Name}" />
+                                        <TextBlock Text="{Binding Path=District}" />
+                                        <TextBlock Text="{Binding Path=Mode}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Button Command="{Binding UpdateCommand}">Обновить</Button>
+                        <Button Command="{Binding ClearCommand}">Очистить избранное</Button>
+
+                    </StackPanel>
+                </TabItem.Content>
 
             </TabItem>
 

@@ -48,7 +48,7 @@ namespace Web_Service.Helpers
 
                     writer.WriteEnd();
 
-                    if (!string.IsNullOrEmpty(current_data))
+                    if (current_data != "\r\n" && !string.IsNullOrEmpty(current_data))
                     {
                         JArray current_doc = JArray.Parse(current_data);
 
