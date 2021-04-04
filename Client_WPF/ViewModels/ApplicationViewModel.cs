@@ -39,10 +39,19 @@ namespace Client_WPF.ViewModels
             {
                 if (value != null)
                 {
-                    var item = Cache.GetOrCreate(value.Id.ToString(), value);
+                    if (value.Id != 0)
+                    {
+                        var item = Cache.GetOrCreate(value.Id.ToString(), value);
 
-                    if (!CacheList.Contains(item))
-                        CacheList.Insert(0, item);
+                        if (!CacheList.Contains(item))
+                            CacheList.Insert(0, item);
+                    }
+                    else
+                    {
+                        CacheList.Remove(CacheList.FirstOrDefault(n => n.Id == 0));
+                        CacheList.Insert(0, value);
+                    }
+
                 }
 
                 selectedPark = value;
@@ -99,9 +108,14 @@ namespace Client_WPF.ViewModels
                   {
                       ParkingInfo park = obj as ParkingInfo;
 
-                      if (park != null)
+                      if (park != null && park.Id != 0)
                       {
                           ReadWriter<List<ParkingInfo>>.Write(new List<ParkingInfo>() { park });
+                      }
+                      else if (park != null)
+                      {
+                          System.Windows.MessageBox.Show("Выбранный вами элемент уже находится в избранном.",
+                              "Предупреждение", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                       }
 
                   },
@@ -120,11 +134,13 @@ namespace Client_WPF.ViewModels
                   {
                       ParkingInfo park = obj as ParkingInfo;
 
-                      if (park != null)
+                      if (park != null && park.Id != 0)
                       {
                           CacheList.Remove(park);
                           Cache.Remove(park.Id.ToString());
                       }
+                      else if (park != null)
+                          CacheList.Remove(park);
 
                   },
                  (obj) => CacheList.Count > 0));
@@ -189,6 +205,7 @@ namespace Client_WPF.ViewModels
                   {
                       ReadWriter<object>.Write(null);
                       Favorites.Clear();
+
                   },
                   (obj) => Favorites.Count > 0));
             }
