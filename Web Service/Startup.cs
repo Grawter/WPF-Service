@@ -41,10 +41,28 @@ namespace Web_Service
 
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Show current data:\n http://localhost:7285/api/Data/Show " +
-                        "\nRe-create data(Warning: Costly operation):\n http://localhost:7285/api/Data/Create" +
-                        "\nUpdate data:\n http://localhost:7285/api/Data/Update" +
-                        "\nExport data to Json" + "\n http://localhost:7285/api/Data/Export");
+                    System.DateTime current_date = System.DateTime.Now;
+
+                    if (current_date.DayOfWeek == System.DayOfWeek.Monday && current_date.Hour == 10)
+                    {
+                        context.Response.Redirect("http://localhost:7285/api/Data/Update");
+                    }
+                    else
+                    {
+                        await context.Response.WriteAsync(@"<script>
+                                                            onload = function () {setTimeout ('location.reload (true)', 60*1000*60)}
+                                                            </script>");
+
+                        await context.Response.WriteAsync(
+                        "<b>Show current data:</b><br> <a href='http://localhost:7285/api/Data/Show'>Click<a>" + "<br>" +
+                        "<b>Re-create data(<u>Warning: Costly operation</u>):</b><br> <a href='http://localhost:7285/api/Data/Create'>Click</a>" + "<br>" +
+                        "<b>Update data:</b><br> <a href='http://localhost:7285/api/Data/Update'>Click</a>" + "<br>" +
+                        "<b>Export data to Json:</b><br> <a href='http://localhost:7285/api/Data/Export'>Click</a>" + "<br>");
+
+                        await context.Response.WriteAsync("<br><b>Today: </b>" + current_date.DayOfWeek.ToString() + "<br>" + current_date.ToShortDateString() + "<br>");
+
+                        await context.Response.WriteAsync("<br><span style='font-size: 1.4em;'>The database is updated <b>automatically</b> every Monday at 10:00</span>");
+                    }
                 });
             });
         }
